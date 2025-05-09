@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.chengfu.usercenter.mapper.UserMapper">
+<mapper namespace="generator.mapper.UserMapper">
 
-    <resultMap id="BaseResultMap" type="com.chengfu.usercenterapi.model.domain.User">
+    <resultMap id="BaseResultMap" type="generator.domain.User">
             <id property="id" column="id" />
             <result property="userName" column="user_name" />
             <result property="avatarUrl" column="avatar_url" />
@@ -17,11 +17,12 @@
             <result property="createTime" column="create_time" />
             <result property="updateTime" column="update_time" />
             <result property="isDelete" column="is_delete" />
+            <result property="userRole" column="user_role" />
     </resultMap>
 
     <sql id="Base_Column_List">
         id,user_name,avatar_url,gender,login_account,user_password,
         phone,email,user_status,create_time,update_time,
-        is_delete
+        is_delete,user_role
     </sql>
 </mapper>

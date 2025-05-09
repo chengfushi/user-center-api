@@ -76,7 +76,7 @@ public class User {
     @TableLogic
     private Integer isDelete;
 
-    private Integer role;
+    private Integer userRole;
 
     @Override
     public boolean equals(Object that) {
