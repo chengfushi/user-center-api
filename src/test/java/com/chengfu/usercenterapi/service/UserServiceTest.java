@@ -1,10 +1,11 @@
-package com.chengfu.usercenter.service;
+package com.chengfu.usercenterapi.service;
 import java.util.Date;
 
-import com.chengfu.usercenter.model.domain.User;
+import com.chengfu.usercenterapi.model.domain.User;
 import jakarta.annotation.Resource;
-import org.junit.jupiter.api.Assertions;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -46,11 +47,22 @@ public class UserServiceTest {
 
 	@Test
 	void userRegister() {
-		String userAccount = "testChengFu1";
+		String userAccount = "testChengFu4";
 		String password = "12345678";
 		String confirmPassword = "12345678";
 
 		long result = userService.userRegister(userAccount, password, confirmPassword);
 		assertTrue(result > 0);
+	}
+
+	@Test
+	void userLogin() {
+		HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+		String userAccount = "testChengFu2";
+		String password = "12345678";
+		String confirmPassword = "12345678";
+		User reslut = userService.userLogin(userAccount, password,request);
+		assertNotNull(reslut);
+
 	}
 }

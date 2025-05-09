@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>org.learnspringboot</groupId>
-    <artifactId>userCenter</artifactId>
+    <artifactId>user-center-api</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>userCenter</name>
-    <description>userCenter</description>
+    <name>user-center-api-</name>
+    <description>user-center-api</description>
     <url/>
     <licenses>
         <license/>

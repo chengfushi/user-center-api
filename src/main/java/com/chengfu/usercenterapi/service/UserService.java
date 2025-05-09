@@ -1,7 +1,8 @@
-package com.chengfu.usercenter.service;
+package com.chengfu.usercenterapi.service;
 
-import com.chengfu.usercenter.model.domain.User;
+import com.chengfu.usercenterapi.model.domain.User;
 import com.baomidou.mybatisplus.extension.service.IService;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
 * @author 30362
@@ -16,5 +17,12 @@ public interface UserService extends IService<User> {
 	 * @author Cheng Fu
 	 */
 	long userRegister(String userAccount,String userPassword,String checkPassword);
+	
+	/** 
+	 * @description: 用户登录逻辑 
+	 * @return: 用户脱敏后的信息
+	 * @author Cheng Fu
+	 */
+	User userLogin(String userAccount, String userPassword, HttpServletRequest request);
 
 }

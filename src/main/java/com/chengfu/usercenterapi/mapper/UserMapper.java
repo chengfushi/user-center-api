@@ -1,6 +1,6 @@
-package com.chengfu.usercenter.mapper;
+package com.chengfu.usercenterapi.mapper;
 
-import com.chengfu.usercenter.model.domain.User;
+import com.chengfu.usercenterapi.model.domain.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**

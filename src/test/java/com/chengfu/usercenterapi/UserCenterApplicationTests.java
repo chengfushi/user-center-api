@@ -1,6 +1,5 @@
-package com.chengfu.usercenter;
+package com.chengfu.usercenterapi;
 
-import org.apache.tomcat.util.net.openssl.ciphers.MessageDigest;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.DigestUtils;

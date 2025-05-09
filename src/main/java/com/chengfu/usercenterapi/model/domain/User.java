@@ -1,7 +1,8 @@
-package com.chengfu.usercenter.model.domain;
+package com.chengfu.usercenterapi.model.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.util.Date;
 import lombok.Data;
@@ -72,7 +73,10 @@ public class User {
     /**
      * 逻辑删除(0-未删除 1-已删除)
      */
+    @TableLogic
     private Integer isDelete;
+
+    private Integer role;
 
     @Override
     public boolean equals(Object that) {
