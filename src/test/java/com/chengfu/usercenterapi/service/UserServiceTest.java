@@ -47,7 +47,7 @@ public class UserServiceTest {
 
 	@Test
 	void userRegister() {
-		String userAccount = "testChengFu4";
+		String userAccount = "AdminChengFu";
 		String password = "12345678";
 		String confirmPassword = "12345678";
 
@@ -65,4 +65,6 @@ public class UserServiceTest {
 		assertNotNull(reslut);
 
 	}
+
+
 }

@@ -15,6 +15,8 @@ import org.springframework.util.DigestUtils;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.chengfu.usercenterapi.constant.UserConstant.USER_LOGIN_STATE;
+
 /**
 * @author 30362
 * @description 针对表【user(用户信息表)】的数据库操作Service实现
@@ -29,8 +31,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
 	//盐值，混淆密码
 	private static final String SALT = "chengfu";
-
-	public static final String UserLoginState = "userLoginState";
 
 
 	@Override
@@ -135,9 +135,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 			return null;
 		}
 
-		//将用户放入Session
-		request.getSession().setAttribute(UserLoginState, user);
+		User safetyUser = getSafetyUser(user);
 
+
+
+		//返回脱敏后的用户信息
+		//将用户放入Session
+		request.getSession().setAttribute(USER_LOGIN_STATE, safetyUser);
+		return safetyUser;
+	}
+
+	/*
+	脱敏方法
+	 */
+	@Override
+	public User getSafetyUser(User user) {
 		//对用户信息进行脱敏
 		User safetyUser = new User();
 		safetyUser.setId(user.getId());
@@ -151,9 +163,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 		safetyUser.setUserStatus(0);
 		safetyUser.setCreateTime(user.getCreateTime());
 		safetyUser.setUpdateTime(new Date());
+		safetyUser.setUserRole(user.getUserRole());
 
-		//返回脱敏后的用户信息
 		return safetyUser;
+	}
+
+	/*
+	用户登出
+	 */
+	@Override
+	public Integer userLogout(HttpServletRequest request) {
+		request.getSession().removeAttribute(USER_LOGIN_STATE);
+
+		return 1;
+
 	}
 }
 
