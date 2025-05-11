@@ -3,6 +3,8 @@ import java.util.Date;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.chengfu.usercenterapi.common.BusinessException;
+import com.chengfu.usercenterapi.common.ErrorCode;
 import com.chengfu.usercenterapi.model.domain.User;
 import com.chengfu.usercenterapi.service.UserService;
 import com.chengfu.usercenterapi.mapper.UserMapper;
@@ -41,15 +43,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 //		2. 密码不小于8位(不加强校验)
 
 		if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
-			return -1;
+			throw new BusinessException(ErrorCode.PARAMS_ERROR,"参数为空");
 		}
 
 		if (userAccount.length() < 4 ) {
-			return -1;
+			throw new BusinessException(ErrorCode.PARAMS_ERROR,"参数过短");
 		}
 
 		if (userPassword.length() < 8 || checkPassword.length() < 8) {
-			return -1;
+			throw new BusinessException(ErrorCode.PARAMS_ERROR,"参数过短");
 		}
 
 //		4. 账户不包含特殊字符
@@ -57,12 +59,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
 		Matcher matcher = Pattern.compile(validPattern).matcher(userAccount);
 		if (!matcher.find()) {
-			return  - 1;
+			throw new BusinessException(ErrorCode.PARAMS_ERROR,"参数包含敏感字符");
 		}
 
 //		5. 密码和校验密码相同
 		if (!checkPassword.equals(userPassword)) {
-			return -1;
+			throw new BusinessException(ErrorCode.PARAMS_ERROR,"两次密码不一致");
 		}
 
 		//	3. 账户不能重复
@@ -71,7 +73,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 		long count  = userMapper.selectCount(queryWrapper);
 
 		if (count > 0) {
-			return -1;
+			throw new BusinessException(ErrorCode.PARAMS_ERROR,"账户重复");
 		}
 
 		//对密码进行加密
@@ -99,15 +101,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 //		2. 密码不小于8位(不加强校验)
 
 		if (StringUtils.isAnyBlank(userAccount, userPassword)) {
-			return null;
+			throw new BusinessException(ErrorCode.PARAMS_ERROR,"参数为空");
 		}
 
 		if (userAccount.length() < 4 ) {
-			return null;
+			throw new BusinessException(ErrorCode.PARAMS_ERROR,"参数过短");
 		}
 
 		if (userPassword.length() < 8 ) {
-			return null;
+			throw new BusinessException(ErrorCode.PARAMS_ERROR,"参数过短");
 		}
 
 //		4. 账户不包含特殊字符
@@ -115,7 +117,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
 		Matcher matcher = Pattern.compile(validPattern).matcher(userAccount);
 		if (!matcher.find()) {
-			return  null;
+			throw new BusinessException(ErrorCode.PARAMS_ERROR,"账户包含敏感字符");
 		}
 
 		//对密码进行加密

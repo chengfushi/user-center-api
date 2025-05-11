@@ -2,10 +2,14 @@ package com.chengfu.usercenterapi.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.chengfu.usercenterapi.common.BaseResponse;
+import com.chengfu.usercenterapi.common.BusinessException;
+import com.chengfu.usercenterapi.common.ErrorCode;
 import com.chengfu.usercenterapi.model.domain.User;
 import com.chengfu.usercenterapi.model.request.UserLoginRequest;
 import com.chengfu.usercenterapi.model.request.UserRegisterRequest;
 import com.chengfu.usercenterapi.service.UserService;
+import com.chengfu.usercenterapi.utils.ResultUtils;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
@@ -30,36 +34,40 @@ public class UserController {
 	private UserService userService;
 
 	@PostMapping("/register")
-	public Long userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
+	public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
 		if (userRegisterRequest == null) {
-			return null;
+			throw new BusinessException(ErrorCode.PARAMS_ERROR);
 		}
 		String userAccount = userRegisterRequest.getUserAccount();
 		String userPassword = userRegisterRequest.getUserPassword();
 		String checkPassword = userRegisterRequest.getCheckPassword();
 
 		if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
-			return null;
+			throw new BusinessException(ErrorCode.PARAMS_NULL_ERROR);
 		}
 
 
-		return userService.userRegister(userAccount, userPassword, checkPassword);
+		long userRegister = userService.userRegister(userAccount, userPassword, checkPassword);
+
+		return ResultUtils.success(userRegister);
 
 	}
 
 	@PostMapping("/login")
-	public User userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
+	public BaseResponse<User> userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
 		if (userLoginRequest == null) {
-			return null;
+			throw new BusinessException(ErrorCode.PARAMS_NULL_ERROR);
 		}
 
 		String userAccount = userLoginRequest.getUserAccount();
 		String userPassword = userLoginRequest.getUserPassword();
 		if (StringUtils.isAnyBlank(userAccount, userPassword)) {
-			return null;
+			throw new BusinessException(ErrorCode.PARAMS_NULL_ERROR);
 		}
 
-		return userService.userLogin(userAccount, userPassword, request);
+		User user = userService.userLogin(userAccount, userPassword, request);
+
+		return ResultUtils.success(user);
 
 	}
 
@@ -68,11 +76,13 @@ public class UserController {
 	管理员通过用户名查询用户
 	 */
 	@GetMapping("/search")
-	public List<User> searchUser(String userName,HttpServletRequest request) {
+	public BaseResponse<List<User>> searchUser(String userName,HttpServletRequest request) {
 
 		//判断当前用户的身份
 		if (!isAdmin(request)){
-			return new ArrayList<>();
+			//返回权限错误信息
+			throw new BusinessException(ErrorCode.NO_AUTH);
+
 		}
 
 
@@ -85,7 +95,9 @@ public class UserController {
 
 		List<User> userList =  userService.list(queryWrapper);
 
-		return userList.stream().map(user -> userService.getSafetyUser(user)).collect(Collectors.toList());
+		List<User> searchResult = userList.stream().map(user -> userService.getSafetyUser(user)).toList();
+
+		return ResultUtils.success(searchResult);
 	}
 
 	/*
@@ -95,7 +107,7 @@ public class UserController {
 	public boolean deleteUser(@RequestBody long userID,HttpServletRequest request){
 		//判断用户当前的身份
 		if (!isAdmin(request)){
-			return false;
+			throw new BusinessException(ErrorCode.NO_AUTH);
 		}
 
 		//创建一个查询条件
@@ -129,7 +141,7 @@ public class UserController {
 	@PostMapping("/logout")
 	public Integer userLogout(HttpServletRequest request) {
 		if (request == null) {
-			return null;
+			new BusinessException(ErrorCode.PARAMS_NULL_ERROR);
 		}
 
 		return userService.userLogout(request);
