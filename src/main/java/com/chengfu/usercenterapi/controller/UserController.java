@@ -28,6 +28,7 @@ import static com.chengfu.usercenterapi.constant.UserConstant.USER_LOGIN_STATE;
  */
 @RestController
 @RequestMapping("/user")
+//@CrossOrigin(origins = {"https://localhost:3000"},allowCredentials = "true")
 public class UserController {
 
 	@Resource
@@ -43,7 +44,7 @@ public class UserController {
 		String checkPassword = userRegisterRequest.getCheckPassword();
 
 		if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
-			throw new BusinessException(ErrorCode.PARAMS_NULL_ERROR);
+			return null;
 		}
 
 
@@ -56,19 +57,49 @@ public class UserController {
 	@PostMapping("/login")
 	public BaseResponse<User> userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
 		if (userLoginRequest == null) {
-			throw new BusinessException(ErrorCode.PARAMS_NULL_ERROR);
+			return ResultUtils.error(ErrorCode.PARAMS_ERROR);
 		}
 
 		String userAccount = userLoginRequest.getUserAccount();
 		String userPassword = userLoginRequest.getUserPassword();
 		if (StringUtils.isAnyBlank(userAccount, userPassword)) {
-			throw new BusinessException(ErrorCode.PARAMS_NULL_ERROR);
+			return ResultUtils.error(ErrorCode.PARAMS_ERROR);
 		}
 
 		User user = userService.userLogin(userAccount, userPassword, request);
 
 		return ResultUtils.success(user);
 
+	}
+
+	/*
+用户注销
+ */
+	@PostMapping("/logout")
+	public BaseResponse<Integer> userLogout(HttpServletRequest request) {
+		if (request == null) {
+			new BusinessException(ErrorCode.PARAMS_NULL_ERROR);
+		}
+
+		Integer result = userService.userLogout(request);
+		return ResultUtils.success(result);
+	}
+
+
+
+
+	@GetMapping("/current")
+	public BaseResponse<User> getCurrentUser(HttpServletRequest request) {
+		Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+		User currentUser = (User) userObj;
+		if (currentUser == null) {
+			return ResultUtils.error(ErrorCode.NOT_LOGIN, "用户未登录");
+		}
+		long userId = currentUser.getId();
+		// TODO 校验用户是否合法
+		User user = userService.getById(userId);
+		User safetyUser = userService.getSafetyUser(user);
+		return ResultUtils.success(safetyUser);
 	}
 
 
@@ -81,10 +112,9 @@ public class UserController {
 		//判断当前用户的身份
 		if (!isAdmin(request)){
 			//返回权限错误信息
-			throw new BusinessException(ErrorCode.NO_AUTH);
+			throw new BusinessException(ErrorCode.NO_AUTH,"无管理员权限");
 
 		}
-
 
 		QueryWrapper<User> queryWrapper = new QueryWrapper<>();
 
@@ -104,17 +134,19 @@ public class UserController {
 	管理员删除用户
 	 */
 	@DeleteMapping ("/delete")
-	public boolean deleteUser(@RequestBody long userID,HttpServletRequest request){
+	public BaseResponse<Boolean> deleteUser(@RequestBody long userID,HttpServletRequest request){
 		//判断用户当前的身份
 		if (!isAdmin(request)){
-			throw new BusinessException(ErrorCode.NO_AUTH);
+			return ResultUtils.error(ErrorCode.NO_AUTH,"无权限");
 		}
 
-		//创建一个查询条件
-		QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+		if (userID <= 0){
+			throw new BusinessException(ErrorCode.PARAMS_ERROR);
+		}
 
 		//删除用户(逻辑删除)
-		return userService.removeById(userID);
+		boolean userDelete = userService.removeById(userID);
+		return ResultUtils.success(userDelete);
 	}
 
 	/*
@@ -135,16 +167,5 @@ public class UserController {
 		return true;
 	}
 
-	/*
-	用户注销
-	 */
-	@PostMapping("/logout")
-	public Integer userLogout(HttpServletRequest request) {
-		if (request == null) {
-			new BusinessException(ErrorCode.PARAMS_NULL_ERROR);
-		}
-
-		return userService.userLogout(request);
-	}
 
 }
