@@ -34,6 +34,7 @@ public class UserController {
 	@Resource
 	private UserService userService;
 
+
 	@PostMapping("/register")
 	public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
 		if (userRegisterRequest == null) {
@@ -134,18 +135,18 @@ public class UserController {
 	管理员删除用户
 	 */
 	@DeleteMapping ("/delete")
-	public BaseResponse<Boolean> deleteUser(@RequestBody long userID,HttpServletRequest request){
+	public BaseResponse<Boolean> deleteUser(@RequestBody long id,HttpServletRequest request){
 		//判断用户当前的身份
 		if (!isAdmin(request)){
 			return ResultUtils.error(ErrorCode.NO_AUTH,"无权限");
 		}
 
-		if (userID <= 0){
+		if (id <= 0){
 			throw new BusinessException(ErrorCode.PARAMS_ERROR);
 		}
 
 		//删除用户(逻辑删除)
-		boolean userDelete = userService.removeById(userID);
+		boolean userDelete = userService.removeById(id);
 		return ResultUtils.success(userDelete);
 	}
 
@@ -157,6 +158,10 @@ public class UserController {
 		Object  userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
 
 		User user = (User) userObj;
+
+		if (userObj == null) {
+			return false; // 如果用户对象为空，直接返回false
+		}
 
 
 		//获取当前的权限
