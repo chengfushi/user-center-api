@@ -108,28 +108,19 @@ public class UserController {
 	管理员通过用户名查询用户
 	 */
 	@GetMapping("/search")
-	public BaseResponse<List<User>> searchUser(String userName,HttpServletRequest request) {
-
-		//判断当前用户的身份
-		if (!isAdmin(request)){
-			//返回权限错误信息
-			throw new BusinessException(ErrorCode.NO_AUTH,"无管理员权限");
-
+	public BaseResponse<List<User>> searchUsers(String userName, HttpServletRequest request) {
+		if (!isAdmin(request)) {
+			return ResultUtils.error(ErrorCode.NO_AUTH,"无管理员权限");
 		}
-
 		QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-
-		//校验参数
-		if (StringUtils.isNoneBlank(userName)) {
+		if (StringUtils.isNotBlank(userName)) {
 			queryWrapper.like("user_name", userName);
 		}
-
-		List<User> userList =  userService.list(queryWrapper);
-
-		List<User> searchResult = userList.stream().map(user -> userService.getSafetyUser(user)).toList();
-
-		return ResultUtils.success(searchResult);
+		List<User> userList = userService.list(queryWrapper);
+		List<User> list = userList.stream().map(user -> userService.getSafetyUser(user)).collect(Collectors.toList());
+		return ResultUtils.success(list);
 	}
+
 
 	/*
 	管理员删除用户
