@@ -8,10 +8,11 @@ spring:
         password: mysql
 
 
-    servlet:
-        context-path: /api
+
 server:
     port: 8080
+    servlet:
+        context-path: /api
 
 mybatis-plus:
     global-config:
