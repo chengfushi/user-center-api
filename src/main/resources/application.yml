@@ -8,10 +8,11 @@ spring:
         password: mysql
 
 
-    servlet:
-        context-path: /api
+
 server:
     port: 8080
+    servlet:
+        context-path: /api
 
 mybatis-plus:
     global-config:
@@ -19,3 +20,10 @@ mybatis-plus:
             logic-delete-field: is_delete # 全局逻辑删除字段名
             logic-delete-value: 1 # 逻辑已删除值
             logic-not-delete-value: 0 # 逻辑未删除值
+
+    configuration:
+        log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+        mapper-locations: classpath:src/main/resources/BookListMapper.xml # 若有XML映射文件，指定路径
+    logging:
+        level:
+            com.chengfu.usercenterapi.mapper: DEBUG # 这里替换为你的Mapper接口所在包路径

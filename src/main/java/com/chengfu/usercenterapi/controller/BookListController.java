@@ -7,6 +7,7 @@ import com.chengfu.usercenterapi.common.BusinessException;
 import com.chengfu.usercenterapi.common.ErrorCode;
 import com.chengfu.usercenterapi.model.domain.BookList;
 import com.chengfu.usercenterapi.model.domain.User;
+import com.chengfu.usercenterapi.model.domain.UserMessage;
 import com.chengfu.usercenterapi.model.request.BookAddRequest;
 import com.chengfu.usercenterapi.model.request.BookUpdateRequest;
 import com.chengfu.usercenterapi.service.BookListService;
