@@ -35,4 +35,6 @@ public class BookUpdateRequest implements Serializable {
 	 */
 	private Date publishDate;
 
+	private String bookImageBase64;
+
 }

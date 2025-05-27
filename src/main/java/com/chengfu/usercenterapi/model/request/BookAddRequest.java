@@ -33,4 +33,9 @@ public class BookAddRequest implements Serializable {
 	 *
 	 */
 	private Date publishDate;
+
+	/**
+	 *存储前端传过来图片，是base64格式
+	 */
+	private String bookImageBase64;
 }

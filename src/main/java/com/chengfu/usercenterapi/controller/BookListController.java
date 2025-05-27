@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.chengfu.usercenterapi.common.BaseResponse;
 import com.chengfu.usercenterapi.common.BusinessException;
 import com.chengfu.usercenterapi.common.ErrorCode;
+import com.chengfu.usercenterapi.model.cto.BookCTO;
 import com.chengfu.usercenterapi.model.domain.BookList;
 import com.chengfu.usercenterapi.model.domain.User;
 import com.chengfu.usercenterapi.model.domain.UserMessage;
@@ -16,6 +17,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import static com.chengfu.usercenterapi.constant.UserConstant.USER_LOGIN_STATE;
@@ -48,6 +51,14 @@ public class BookListController {
 		bookList.setBookPrice(bookAddRequest.getBookPrice());
 		bookList.setPublishDate(bookAddRequest.getPublishDate());
 
+		if (bookAddRequest.getBookImageBase64() == null){
+			bookList.setBookImage(null);
+		}else{
+			//将base64图片格式转为二进制存储
+			byte[] bookImageBinary = Base64.getDecoder().decode(bookAddRequest.getBookImageBase64());
+			bookList.setBookImage(bookImageBinary);
+		}
+
 		//将数据保存到数据库中
 		boolean save = bookListService.save(bookList);
 
@@ -63,14 +74,41 @@ public class BookListController {
 	 * @author ChengFu
 	 * @date 2025/5/15 17:56
 	 */
-	public BaseResponse<List<BookList>> searchBook(String bookName){
+	public BaseResponse<List<BookCTO>> searchBook(String bookName){
 
 		//根据书名查找数据
 		QueryWrapper<BookList> queryWrapper = new QueryWrapper<>();
 		queryWrapper.like("book_name", bookName);
 		List<BookList> bookLists = bookListService.list(queryWrapper);
 
-		return ResultUtils.success(bookLists);
+		List<BookCTO> bookCTOS = new ArrayList<>();
+
+		//将每一个图片转为base64格式
+		for (BookList bookList : bookLists) {
+			BookCTO bookCTO = new BookCTO();
+			//将全部数据移植到bookcto中
+			bookCTO.setBookIsbn(bookList.getBookIsbn());
+			bookCTO.setBookName(bookList.getBookName());
+			bookCTO.setBookPrice(bookList.getBookPrice());
+			bookCTO.setPublishDate(bookList.getPublishDate());
+			bookCTO.setCreateTime(bookList.getCreateTime());
+			bookCTO.setUpdateTime(bookList.getUpdateTime());
+			//将图片转为base64格式
+			if (bookList.getBookImage() != null) {
+				byte[] bookImage = bookList.getBookImage();
+				String bookImageBase64 = Base64.getEncoder().encodeToString(bookImage);
+				bookCTO.setBookImageBase64(bookImageBase64);
+			}else{
+				bookCTO.setBookImageBase64(null);
+			}
+
+			//将数据加入到列表
+			bookCTOS.add(bookCTO);
+
+		}
+
+
+		return ResultUtils.success(bookCTOS);
 
 	}
 
@@ -89,6 +127,15 @@ public class BookListController {
 		bookList.setBookName(bookUpdateRequest.getBookName());
 		bookList.setBookPrice(bookUpdateRequest.getBookPrice());
 		bookList.setPublishDate(bookUpdateRequest.getPublishDate());
+
+		if (bookUpdateRequest.getBookImageBase64() == null){
+			bookList.setBookImage(null);
+		}
+		else {
+			//将base64图片格式转为二进制存储
+			byte[] bookImageBinary = Base64.getDecoder().decode(bookUpdateRequest.getBookImageBase64());
+			bookList.setBookImage(bookImageBinary);
+		}
 
 		boolean update = bookListService.update(bookList, queryWrapper);
 		return ResultUtils.success(update);
